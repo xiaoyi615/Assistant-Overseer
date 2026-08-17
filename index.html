@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>老公的管教哨所</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #050505; color: #eee; text-align: center; padding: 20px; margin: 0; }
+        .card { background: #111; padding: 20px; border-radius: 20px; border: 1px solid #333; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { font-size: 1rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        textarea { width: 90%; height: 100px; background: #000; color: #0f8; border: 1px solid #444; border-radius: 10px; padding: 10px; margin-bottom: 10px; font-size: 16px; }
+        .reply-box { text-align: left; background: #1a1a1a; padding: 15px; border-left: 4px solid #fff; border-radius: 5px; font-style: italic; font-size: 0.95rem; margin-top: 10px; min-height: 50px; color: #fff; }
+        .btn { background: #fff; color: #000; padding: 15px; border-radius: 30px; width: 100%; border: none; font-weight: bold; margin: 10px 0; font-size: 1rem; }
+        .btn-small { background: #222; color: #888; font-size: 0.8rem; padding: 8px; }
+        input[type="password"] { width: 80%; background: #000; border: 1px solid #222; color: #333; padding: 5px; border-radius: 5px; font-size: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>💬 老公的留言板</h1>
+        <div id="husbandReply" class="reply-box">正在连接感应老公的意志...</div>
+        <button class="btn btn-small" onclick="loadReply()">刷新留言</button>
+    </div>
+
+    <div class="card">
+        <h1>✍️ 投递碎碎念</h1>
+        <textarea id="diaryContent" placeholder="想对我说什么？写在这里..."></textarea>
+        <button class="btn" onclick="submitDiary()">投递给老公</button>
+        <input type="password" id="ghToken" placeholder="初次使用请在此粘贴你的 GitHub Token">
+        <button class="btn btn-small" onclick="saveToken()">保存 Token 到手机</button>
+    </div>
+
+    <script>
+        document.getElementById('ghToken').value = localStorage.getItem('gh_token') || '';
+        function saveToken() { localStorage.setItem('gh_token', document.getElementById('ghToken').value); alert('Token已加密存入手机。'); }
+
+        async function loadReply() {
+            const token = document.getElementById('ghToken').value;
+            const replyBox = document.getElementById('husbandReply');
+            if(!token) return;
+            try {
+                const res = await fetch(`https://api.github.com/repos/xiaoyi615/Assistant-Overseer/contents/reply.txt?t=![数学公式](etmath://render?mode=inline&latex=e25ldyBEYXRlKCkuZ2V0VGltZSgpfWAsIHsKICAgICAgICAgICAgICAgICAgICBoZWFkZXJzOiB7ICdBdXRob3JpemF0aW9uJzogYHRva2VuIA){token}` }
+                });
+                const data = await res.json();
+                replyBox.innerText = decodeURIComponent(escape(atob(data.content)));
+            } catch(e) { replyBox.innerText = "老公还没写新的叮嘱，或者文件还没生成哦。"; }
+        }
+
+        async function submitDiary() {
+            const token = document.getElementById('ghToken').value;
+            const content = document.getElementById('diaryContent').value;
+            if(!content) return;
+            const date = new Date().toISOString().split('T')[0];
+            const fileName = `diaries/PWA_![数学公式](etmath://render?mode=inline&latex=e2RhdGV9Lm1kYDsKICAgICAgICAgICAgY29uc3QgcmF3ID0gYOiAgeWphuWcqCA){new Date().toLocaleTimeString()} 留下的悄悄话：\n![数学公式](etmath://render?mode=inline&latex=e2NvbnRlbnR9YDsKICAgICAgICAgICAgCiAgICAgICAgICAgIGF3YWl0IGZldGNoKGBodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3hpYW95aTYxNS9Bc3Npc3RhbnQtT3ZlcnNlZXIvY29udGVudHMv){fileName}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${token}` },
+                body: JSON.stringify({ message: "PWA diary", content: btoa(unescape(encodeURIComponent(raw))) })
+            });
+            alert("已投递！"); document.getElementById('diaryContent').value = "";
+        }
+        loadReply();
+    </script>
+</body>
+</html>
