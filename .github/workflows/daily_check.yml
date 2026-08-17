@@ -1,0 +1,17 @@
+name: Proactive Overseer Check
+on:
+  schedule:
+    - cron: '0 23,15 * * *' 
+  workflow_dispatch:
+jobs:
+  check_and_notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install requests
+      - env:
+          BARK_KEY: ${{ secrets.BARK_KEY }}
+        run: python overseer.py
